@@ -114,7 +114,8 @@ namespace PracticeWebAPI.Controllers
                 Description = pet.Description,
             };
 
-            // This ModelState will be applyed on the jsonPatchDocument, not on the patchPet object
+            // This ModelState will be applied on the jsonPatchDocument,
+            // not on the patchPet object
             jsonPatchDocument.ApplyTo(patchPet, ModelState);
 
             if (!ModelState.IsValid)
