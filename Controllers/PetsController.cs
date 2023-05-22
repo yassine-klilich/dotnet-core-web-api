@@ -8,10 +8,17 @@ namespace PracticeWebAPI.Controllers
     [ApiController]
     public class PetsController : ControllerBase
     {
+        private readonly ILogger<PetsController> _logger;
+
+        public PetsController(ILogger<PetsController> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         [HttpGet]
         public ActionResult<List<Pet>> GetPets(int ownerId)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -24,7 +31,7 @@ namespace PracticeWebAPI.Controllers
         [HttpGet("{petId}", Name = "GetPet")]
         public ActionResult<Pet> GetPet(int ownerId, int petId)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -44,7 +51,7 @@ namespace PracticeWebAPI.Controllers
         [HttpPost]
         public ActionResult<Pet> PostPet(int ownerId, HttpPostPet postPet)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -71,7 +78,7 @@ namespace PracticeWebAPI.Controllers
         [HttpPut("{petId}")]
         public ActionResult<Pet> PutPet(int ownerId, int petId, HttpPutPet putPet)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -94,7 +101,7 @@ namespace PracticeWebAPI.Controllers
         [HttpPatch("{petId}")]
         public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -138,7 +145,7 @@ namespace PracticeWebAPI.Controllers
         [HttpDelete("{petId}")]
         public ActionResult<Pet> DeletePet(int ownerId, int petId)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _getOwner(ownerId);
 
             if (owner == null)
             {
@@ -155,6 +162,18 @@ namespace PracticeWebAPI.Controllers
             owner.Pets.Remove(pet);
 
             return NoContent();
+        }
+
+        private Owner? _getOwner(int ownerId)
+        {
+            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+
+            if (owner == null)
+            {
+                _logger.LogInformation($"Can't find an owner with id {ownerId}");
+            }
+
+            return owner;
         }
     }
 }
