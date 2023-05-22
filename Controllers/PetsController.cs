@@ -101,45 +101,54 @@ namespace PracticeWebAPI.Controllers
         [HttpPatch("{petId}")]
         public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
         {
-            Owner? owner = _getOwner(ownerId);
-
-            if (owner == null)
+            try
             {
-                return NotFound();
+                Owner? owner = _getOwner(ownerId);
+
+                if (owner == null)
+                {
+                    return NotFound();
+                }
+
+                Pet? pet = owner.Pets.Find(x => x.Id == petId);
+
+                if (pet == null)
+                {
+                    return NotFound();
+                }
+
+                HttpPatchPet patchPet = new HttpPatchPet()
+                {
+                    Name = pet.Name,
+                    Description = pet.Description,
+                };
+
+                // This ModelState will be applied on the jsonPatchDocument,
+                // not on the patchPet object
+                jsonPatchDocument.ApplyTo(patchPet, ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Model validation for patchPer object
+                if (!TryValidateModel(patchPet))
+                {
+                    return BadRequest(ModelState);
+                }
+
+                pet.Name = patchPet.Name;
+                pet.Description = patchPet.Description;
+
+                return Ok(pet);
+
             }
-
-            Pet? pet = owner.Pets.Find(x => x.Id == petId);
-
-            if (pet == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogCritical("Exception while updating a pet", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "A problem happened while handling your request.");
             }
-
-            HttpPatchPet patchPet = new HttpPatchPet()
-            {
-                Name = pet.Name,
-                Description = pet.Description,
-            };
-
-            // This ModelState will be applied on the jsonPatchDocument,
-            // not on the patchPet object
-            jsonPatchDocument.ApplyTo(patchPet, ModelState);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Model validation for patchPer object
-            if (!TryValidateModel(patchPet))
-            {
-                return BadRequest(ModelState);
-            }
-
-            pet.Name = patchPet.Name;
-            pet.Description = patchPet.Description;
-
-            return Ok(pet);
         }
 
         [HttpDelete("{petId}")]
