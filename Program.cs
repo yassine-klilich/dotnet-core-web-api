@@ -1,6 +1,19 @@
 using Microsoft.AspNetCore.StaticFiles;
+using Serilog;
+
+// Add Serilog logger configurations
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("log/pet-store.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
+
+// Set Serilog logger service
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
