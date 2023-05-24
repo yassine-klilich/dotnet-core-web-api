@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
+using PracticeWebAPI.Services;
 
 namespace PracticeWebAPI.Controllers
 {
@@ -9,10 +10,14 @@ namespace PracticeWebAPI.Controllers
     public class PetsController : ControllerBase
     {
         private readonly ILogger<PetsController> _logger;
+        private readonly IMailService _localMail;
+        private readonly PetStoreDataStore _petStoreDataStore;
 
-        public PetsController(ILogger<PetsController> logger)
+        public PetsController(ILogger<PetsController> logger, IMailService localMail, PetStoreDataStore petStoreDataStore)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _localMail = localMail ?? throw new ArgumentNullException(nameof(logger));
+            _petStoreDataStore = petStoreDataStore ?? throw new ArgumentNullException(nameof(petStoreDataStore));
         }
 
         [HttpGet]
@@ -169,13 +174,14 @@ namespace PracticeWebAPI.Controllers
             }
 
             owner.Pets.Remove(pet);
+            _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.FirstName} {owner.LastName}");
 
             return NoContent();
         }
 
         private Owner? _getOwner(int ownerId)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == ownerId);
+            Owner? owner = _petStoreDataStore.Owners.Find(x => x.Id == ownerId);
 
             if (owner == null)
             {

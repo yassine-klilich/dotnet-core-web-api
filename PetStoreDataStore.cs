@@ -6,8 +6,6 @@ namespace PracticeWebAPI
     {
         public List<Owner> Owners { get; set; }
 
-        public static PetStoreDataStore Instance { get; } = new PetStoreDataStore();
-
         public PetStoreDataStore()
         {
             Owners = new List<Owner>()

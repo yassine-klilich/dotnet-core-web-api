@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.StaticFiles;
+using PracticeWebAPI;
+using PracticeWebAPI.Services;
 using Serilog;
 
 // Add Serilog logger configurations
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .WriteTo.File("log/pet-store.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -23,6 +25,15 @@ builder.Services.AddControllers(options =>
     options.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson()  // AddNewtonsoftJson function changes the default input/output JSON formatter.
 .AddXmlDataContractSerializerFormatters();
+
+// Register a custom service
+#if DEBUG
+builder.Services.AddTransient<IMailService, LocalMailService>();
+#else
+builder.Services.AddTransient<IMailService, CloudMailService>();
+#endif
+
+builder.Services.AddSingleton<PetStoreDataStore>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -8,16 +8,23 @@ namespace PracticeWebAPI.Controllers
     [ApiController]
     public class OwnersController : ControllerBase
     {
+        private readonly PetStoreDataStore _petStoreDataStore;
+
+        public OwnersController(PetStoreDataStore petStoreDataStore)
+        {
+            _petStoreDataStore = petStoreDataStore ?? throw new ArgumentNullException(nameof(petStoreDataStore));
+        }
+
         [HttpGet]
         public ActionResult<List<Owner>> GetOwners()
         {
-            return Ok(PetStoreDataStore.Instance.Owners);
+            return Ok(_petStoreDataStore.Owners);
         }
 
         [HttpGet("{id}")]
         public ActionResult<Owner> GetOwner(int id)
         {
-            Owner? owner = PetStoreDataStore.Instance.Owners.Find(x => x.Id == id);
+            Owner? owner = _petStoreDataStore.Owners.Find(x => x.Id == id);
 
             if (owner == null)
             {
