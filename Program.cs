@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using PracticeWebAPI;
+using PracticeWebAPI.DbContexts;
 using PracticeWebAPI.Services;
 using Serilog;
 
@@ -34,6 +36,9 @@ builder.Services.AddTransient<IMailService, CloudMailService>();
 #endif
 
 builder.Services.AddSingleton<PetStoreDataStore>();
+
+// Register PetStoreDbContext
+builder.Services.AddDbContext<PetStoreDbContext>(options => options.UseSqlServer("Data Source=localhost; Initial Catalog=PetStore; Integrated Security=true; TrustServerCertificate=True"));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
