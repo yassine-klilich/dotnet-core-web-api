@@ -38,7 +38,11 @@ builder.Services.AddTransient<IMailService, CloudMailService>();
 builder.Services.AddSingleton<PetStoreDataStore>();
 
 // Register PetStoreDbContext
-builder.Services.AddDbContext<PetStoreDbContext>(options => options.UseSqlServer("Data Source=localhost; Initial Catalog=PetStore; Integrated Security=true; TrustServerCertificate=True"));
+builder.Services.AddDbContext<PetStoreDbContext>(
+    options => options.UseSqlServer(
+        builder.Configuration["ConnectionStrings:PetStoreDB"]
+    )
+);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
