@@ -5,8 +5,8 @@ namespace PracticeWebAPI.DbContexts
 {
     public class PetStoreDbContext : DbContext
     {
-        DbSet<Owner> Owners { get; set; }
-        DbSet<Pet> Pets { get; set; }
+        public DbSet<Owner> Owners { get; set; }
+        public DbSet<Pet> Pets { get; set; }
 
         public PetStoreDbContext(DbContextOptions<PetStoreDbContext> options) : base(options) { }
 

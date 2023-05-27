@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PracticeWebAPI;
 using PracticeWebAPI.DbContexts;
+using PracticeWebAPI.Repositories;
 using PracticeWebAPI.Services;
 using Serilog;
 
@@ -43,6 +44,9 @@ builder.Services.AddDbContext<PetStoreDbContext>(
         builder.Configuration["ConnectionStrings:PetStoreDB"]
     )
 );
+
+// Register Repository
+builder.Services.AddScoped<IPetStoreRepository, PetStoreRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
