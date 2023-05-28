@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
+using PracticeWebAPI.Repositories;
 
 namespace PracticeWebAPI.Controllers
 {
@@ -8,30 +10,39 @@ namespace PracticeWebAPI.Controllers
     [ApiController]
     public class OwnersController : ControllerBase
     {
-        private readonly PetStoreDataStore _petStoreDataStore;
+        private readonly IPetStoreRepository _petStoreRepository;
+        private readonly IMapper _mapper;
 
-        public OwnersController(PetStoreDataStore petStoreDataStore)
+        public OwnersController(IPetStoreRepository petStoreRepository, IMapper mapper)
         {
-            _petStoreDataStore = petStoreDataStore ?? throw new ArgumentNullException(nameof(petStoreDataStore));
+            _petStoreRepository = petStoreRepository ?? throw new ArgumentNullException(nameof(petStoreRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet]
-        public ActionResult<List<Owner>> GetOwners()
+        public async Task<ActionResult<IEnumerable<OwnerOnly>>> GetOwners()
         {
-            return Ok(_petStoreDataStore.Owners);
+            var owners = await _petStoreRepository.GetOwnersAsync();
+
+            return Ok(_mapper.Map<IEnumerable<OwnerOnly>>(owners));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Owner> GetOwner(int id)
+        public async Task<IActionResult> GetOwner(int id, bool includePets)
         {
-            Owner? owner = _petStoreDataStore.Owners.Find(x => x.Id == id);
+            var owner = await _petStoreRepository.GetOwnerAsync(id, includePets);
 
             if (owner == null)
             {
                 return NotFound();
             }
 
-            return Ok(owner);
+            if (includePets)
+            {
+                return Ok(_mapper.Map<Owner>(owner));
+            }
+
+            return Ok(_mapper.Map<OwnerOnly>(owner));
         }
     }
 }

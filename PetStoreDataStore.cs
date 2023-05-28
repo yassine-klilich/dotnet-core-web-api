@@ -13,14 +13,12 @@ namespace PracticeWebAPI
                 new Owner()
                 {
                     Id = 1,
-                    FirstName = "Ahmad",
-                    LastName = "Omar"
+                    Name = "Ahmad Omar",
                 },
                 new Owner()
                 {
                     Id = 2,
-                    FirstName = "Yassine",
-                    LastName = "Klilich",
+                    Name = "Yassine Klilich",
                     Pets = new List<Pet>()
                     {
                         new Pet()
@@ -40,8 +38,7 @@ namespace PracticeWebAPI
                 new Owner()
                 {
                     Id = 3,
-                    FirstName = "Simo",
-                    LastName = "Filali",
+                    Name = "Simo Filali",
                     Pets = new List<Pet>()
                     {
                         new Pet()

@@ -174,7 +174,7 @@ namespace PracticeWebAPI.Controllers
             }
 
             owner.Pets.Remove(pet);
-            _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.FirstName} {owner.LastName}");
+            _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.Name}");
 
             return NoContent();
         }

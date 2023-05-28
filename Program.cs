@@ -48,6 +48,10 @@ builder.Services.AddDbContext<PetStoreDbContext>(
 // Register Repository
 builder.Services.AddScoped<IPetStoreRepository, PetStoreRepository>();
 
+// Add AutoMapper Service
+// AutoMapper scans for Profiles throught Assemblies of the app
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
