@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
+using PracticeWebAPI.Repositories;
 using PracticeWebAPI.Services;
 
 namespace PracticeWebAPI.Controllers
@@ -11,184 +13,190 @@ namespace PracticeWebAPI.Controllers
     {
         private readonly ILogger<PetsController> _logger;
         private readonly IMailService _localMail;
-        private readonly PetStoreDataStore _petStoreDataStore;
+        private readonly IPetStoreRepository _petStoreRepository;
+        private readonly IMapper _mapper;
 
-        public PetsController(ILogger<PetsController> logger, IMailService localMail, PetStoreDataStore petStoreDataStore)
-        {
+        public PetsController(
+            ILogger<PetsController> logger,
+            IMailService localMail,
+            IPetStoreRepository petStoreRepository,
+            IMapper mapper
+        ) {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _localMail = localMail ?? throw new ArgumentNullException(nameof(logger));
-            _petStoreDataStore = petStoreDataStore ?? throw new ArgumentNullException(nameof(petStoreDataStore));
+            _petStoreRepository = petStoreRepository ?? throw new ArgumentNullException(nameof(petStoreRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet]
-        public ActionResult<List<Pet>> GetPets(int ownerId)
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(int ownerId)
         {
-            Owner? owner = _getOwner(ownerId);
-
-            if (owner == null)
+            if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
             {
                 return NotFound();
             }
+            
+            var pets = await _petStoreRepository.GetPetsAsync(ownerId);
 
-            return Ok(owner.Pets);
+            return Ok(_mapper.Map<IEnumerable<Pet>>(pets));
         }
 
-        [HttpGet("{petId}", Name = "GetPet")]
-        public ActionResult<Pet> GetPet(int ownerId, int petId)
-        {
-            Owner? owner = _getOwner(ownerId);
+        //[HttpGet("{petId}", Name = "GetPet")]
+        //public ActionResult<Pet> GetPet(int ownerId, int petId)
+        //{
+        //    Owner? owner = await _petStoreRepository.GetPetsAsync(ownerId);
 
-            if (owner == null)
-            {
-                return NotFound();
-            }
+        //    if (owner == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Pet? pet = owner.Pets.Find(x => x.Id == petId);
+        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
 
-            if (pet == null)
-            {
-                return NotFound();
-            }
+        //    if (pet == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(pet);
-        }
+        //    return Ok(pet);
+        //}
 
-        [HttpPost]
-        public ActionResult<Pet> PostPet(int ownerId, HttpPostPet postPet)
-        {
-            Owner? owner = _getOwner(ownerId);
+        //[HttpPost]
+        //public ActionResult<Pet> PostPet(int ownerId, HttpPostPet postPet)
+        //{
+        //    Owner? owner = _getOwner(ownerId);
 
-            if (owner == null)
-            {
-                return NotFound();
-            }
+        //    if (owner == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            int id = owner.Pets.Count;
-            Pet newPet = new Pet()
-            {
-                Id = id,
-                Name = postPet.Name,
-                Description = postPet.Description
-            };
+        //    int id = owner.Pets.Count;
+        //    Pet newPet = new Pet()
+        //    {
+        //        Id = id,
+        //        Name = postPet.Name,
+        //        Description = postPet.Description
+        //    };
 
-            owner.Pets.Add(newPet);
+        //    owner.Pets.Add(newPet);
 
-            return CreatedAtRoute("GetPet", new
-            {
-                ownerId = ownerId,
-                petId = id
-            }, newPet);
-        }
+        //    return CreatedAtRoute("GetPet", new
+        //    {
+        //        ownerId = ownerId,
+        //        petId = id
+        //    }, newPet);
+        //}
 
-        [HttpPut("{petId}")]
-        public ActionResult<Pet> PutPet(int ownerId, int petId, HttpPutPet putPet)
-        {
-            Owner? owner = _getOwner(ownerId);
+        //[HttpPut("{petId}")]
+        //public ActionResult<Pet> PutPet(int ownerId, int petId, HttpPutPet putPet)
+        //{
+        //    Owner? owner = _getOwner(ownerId);
 
-            if (owner == null)
-            {
-                return NotFound();
-            }
+        //    if (owner == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Pet? pet = owner.Pets.Find(x => x.Id == petId);
+        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
 
-            if (pet == null)
-            {
-                return NotFound();
-            }
+        //    if (pet == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            pet.Name = putPet.Name;
-            pet.Description = putPet.Description;
+        //    pet.Name = putPet.Name;
+        //    pet.Description = putPet.Description;
 
-            return Ok(pet);
-        }
+        //    return Ok(pet);
+        //}
 
-        [HttpPatch("{petId}")]
-        public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
-        {
-            try
-            {
-                Owner? owner = _getOwner(ownerId);
+        //[HttpPatch("{petId}")]
+        //public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
+        //{
+        //    try
+        //    {
+        //        Owner? owner = _getOwner(ownerId);
 
-                if (owner == null)
-                {
-                    return NotFound();
-                }
+        //        if (owner == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-                Pet? pet = owner.Pets.Find(x => x.Id == petId);
+        //        Pet? pet = owner.Pets.Find(x => x.Id == petId);
 
-                if (pet == null)
-                {
-                    return NotFound();
-                }
+        //        if (pet == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-                HttpPatchPet patchPet = new HttpPatchPet()
-                {
-                    Name = pet.Name,
-                    Description = pet.Description,
-                };
+        //        HttpPatchPet patchPet = new HttpPatchPet()
+        //        {
+        //            Name = pet.Name,
+        //            Description = pet.Description,
+        //        };
 
-                // This ModelState will be applied on the jsonPatchDocument,
-                // not on the patchPet object
-                jsonPatchDocument.ApplyTo(patchPet, ModelState);
+        //        // This ModelState will be applied on the jsonPatchDocument,
+        //        // not on the patchPet object
+        //        jsonPatchDocument.ApplyTo(patchPet, ModelState);
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-                // Model validation for patchPer object
-                if (!TryValidateModel(patchPet))
-                {
-                    return BadRequest(ModelState);
-                }
+        //        // Model validation for patchPer object
+        //        if (!TryValidateModel(patchPet))
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-                pet.Name = patchPet.Name;
-                pet.Description = patchPet.Description;
+        //        pet.Name = patchPet.Name;
+        //        pet.Description = patchPet.Description;
 
-                return Ok(pet);
+        //        return Ok(pet);
 
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical("Exception while updating a pet", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, "A problem happened while handling your request.");
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogCritical("Exception while updating a pet", ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, "A problem happened while handling your request.");
+        //    }
+        //}
 
-        [HttpDelete("{petId}")]
-        public ActionResult<Pet> DeletePet(int ownerId, int petId)
-        {
-            Owner? owner = _getOwner(ownerId);
+        //[HttpDelete("{petId}")]
+        //public ActionResult<Pet> DeletePet(int ownerId, int petId)
+        //{
+        //    Owner? owner = _getOwner(ownerId);
 
-            if (owner == null)
-            {
-                return NotFound();
-            }
+        //    if (owner == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Pet? pet = owner.Pets.Find(x => x.Id == petId);
+        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
 
-            if (pet == null)
-            {
-                return NotFound();
-            }
+        //    if (pet == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            owner.Pets.Remove(pet);
-            _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.Name}");
+        //    owner.Pets.Remove(pet);
+        //    _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.Name}");
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        private Owner? _getOwner(int ownerId)
-        {
-            Owner? owner = _petStoreDataStore.Owners.Find(x => x.Id == ownerId);
+        //private Owner? _getOwner(int ownerId)
+        //{
+        //    Owner? owner = _petStoreRepository
 
-            if (owner == null)
-            {
-                _logger.LogInformation($"Can't find an owner with id {ownerId}");
-            }
+        //    if (owner == null)
+        //    {
+        //        _logger.LogInformation($"Can't find an owner with id {ownerId}");
+        //    }
 
-            return owner;
-        }
+        //    return owner;
+        //}
     }
 }

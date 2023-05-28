@@ -36,5 +36,10 @@ namespace PracticeWebAPI.Repositories
         {
             return await _petStoreDbContext.Pets.Where(p => p.Id == petId && p.OwnerId == ownerId).FirstOrDefaultAsync();
         }
+
+        public async Task<bool> OwnerExistsAsync(int ownerId)
+        {
+            return await _petStoreDbContext.Owners.AnyAsync(o => o.Id == ownerId);
+        }
     }
 }
