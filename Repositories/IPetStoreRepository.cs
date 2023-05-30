@@ -13,5 +13,9 @@ namespace PracticeWebAPI.Repositories
         public Task<IEnumerable<Pet>> GetPetsAsync(int ownerId);
 
         public Task<Pet?> GetPetAsync(int ownerId, int petId);
+
+        public void AddOwner(Owner owner);
+
+        public Task<bool> SaveChangesAsync();
     }
 }

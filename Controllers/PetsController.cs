@@ -41,25 +41,23 @@ namespace PracticeWebAPI.Controllers
             return Ok(_mapper.Map<IEnumerable<Pet>>(pets));
         }
 
-        //[HttpGet("{petId}", Name = "GetPet")]
-        //public ActionResult<Pet> GetPet(int ownerId, int petId)
-        //{
-        //    Owner? owner = await _petStoreRepository.GetPetsAsync(ownerId);
+        [HttpGet("{petId}", Name = "GetPet")]
+        public async Task<ActionResult<Pet>> GetPet(int ownerId, int petId)
+        {
+            if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
+            {
+                return NotFound("Owner not found");
+            }
 
-        //    if (owner == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var result = await _petStoreRepository.GetPetAsync(ownerId, petId);
 
-        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
+            if (result == null)
+            {
+                return NotFound("Pet not found");
+            }
 
-        //    if (pet == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(pet);
-        //}
+            return Ok(_mapper.Map<Pet>(result));
+        }
 
         //[HttpPost]
         //public ActionResult<Pet> PostPet(int ownerId, HttpPostPet postPet)

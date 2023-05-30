@@ -27,7 +27,7 @@ namespace PracticeWebAPI.Controllers
             return Ok(_mapper.Map<IEnumerable<OwnerOnly>>(owners));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetOwner")]
         public async Task<IActionResult> GetOwner(int id, bool includePets)
         {
             var owner = await _petStoreRepository.GetOwnerAsync(id, includePets);
@@ -43,6 +43,26 @@ namespace PracticeWebAPI.Controllers
             }
 
             return Ok(_mapper.Map<OwnerOnly>(owner));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> PostOwner(OwnerOnly owner)
+        {
+            var _postOwner = _mapper.Map<Entities.Owner>(owner);
+
+            _petStoreRepository.AddOwner(_postOwner);
+            
+            await _petStoreRepository.SaveChangesAsync();
+
+            var _createdOwner = _mapper.Map<OwnerOnly>(_postOwner);
+
+            return CreatedAtRoute("GetOwner",
+                new
+                {
+                    id = _createdOwner.Id,
+                    includePets = false
+                },
+                _createdOwner);
         }
     }
 }

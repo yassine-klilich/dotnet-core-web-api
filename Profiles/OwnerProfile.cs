@@ -8,6 +8,8 @@ namespace PracticeWebAPI.Profiles
         {
             CreateMap<Entities.Owner, Models.OwnerOnly>();
             CreateMap<Entities.Owner, Models.Owner>();
+            CreateMap<Models.OwnerOnly, Entities.Owner>();
+            CreateMap<Models.Owner, Entities.Owner>();
         }
     }
 }

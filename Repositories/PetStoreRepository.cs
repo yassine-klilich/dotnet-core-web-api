@@ -41,5 +41,15 @@ namespace PracticeWebAPI.Repositories
         {
             return await _petStoreDbContext.Owners.AnyAsync(o => o.Id == ownerId);
         }
+
+        public void AddOwner(Owner owner)
+        {
+            _petStoreDbContext.Owners.Add(owner);
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _petStoreDbContext.SaveChangesAsync() > 0;
+        }
     }
 }
