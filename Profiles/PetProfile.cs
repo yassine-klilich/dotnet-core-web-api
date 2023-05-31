@@ -7,9 +7,11 @@ namespace PracticeWebAPI.Profiles
     {
         public PetProfile() {
             CreateMap<Entities.Pet, Models.Pet>();
+            CreateMap<Entities.Pet, Models.HttpPatchPet>();
             CreateMap<Models.Pet, Entities.Pet>();
             CreateMap<Models.HttpPostPet, Entities.Pet>();
             CreateMap<Models.HttpPutPet, Entities.Pet>();
+            CreateMap<Models.HttpPatchPet, Entities.Pet>();
         }
     }
 }

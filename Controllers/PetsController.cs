@@ -49,14 +49,14 @@ namespace PracticeWebAPI.Controllers
                 return NotFound("Owner not found");
             }
 
-            var result = await _petStoreRepository.GetPetAsync(ownerId, petId);
+            Entities.Pet? pet = await _petStoreRepository.GetPetAsync(ownerId, petId);
 
-            if (result == null)
+            if (pet == null)
             {
                 return NotFound("Pet not found");
             }
 
-            return Ok(_mapper.Map<Pet>(result));
+            return Ok(_mapper.Map<Pet>(pet));
         }
 
         [HttpPost]
@@ -67,7 +67,7 @@ namespace PracticeWebAPI.Controllers
                 return NotFound("Owner not found");
             }
 
-            var petEntity = _mapper.Map<Entities.Pet>(postPet);
+            Entities.Pet petEntity = _mapper.Map<Entities.Pet>(postPet);
 
             petEntity.OwnerId = ownerId;
 
@@ -75,7 +75,7 @@ namespace PracticeWebAPI.Controllers
 
             await _petStoreRepository.SaveChangesAsync();
 
-            var createdPet = _mapper.Map<Pet>(petEntity);
+            Pet createdPet = _mapper.Map<Pet>(petEntity);
 
             return CreatedAtRoute("GetPet", new
             {
@@ -92,7 +92,7 @@ namespace PracticeWebAPI.Controllers
                 return NotFound("Owner not found");
             }
 
-            var petEntity = await _petStoreRepository.GetPetAsync(ownerId, petId);
+            Entities.Pet? petEntity = await _petStoreRepository.GetPetAsync(ownerId, petId);
             if (petEntity == null)
             {
                 return NotFound("Pet not found");
@@ -105,58 +105,52 @@ namespace PracticeWebAPI.Controllers
             return Ok(_mapper.Map<Pet>(petEntity));
         }
 
-        //[HttpPatch("{petId}")]
-        //public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
-        //{
-        //    try
-        //    {
-        //        Owner? owner = _getOwner(ownerId);
+        [HttpPatch("{petId}")]
+        public async Task<ActionResult<Pet>> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
+        {
+            try
+            {
+                if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
+                {
+                    return NotFound("Owner not found");
+                }
 
-        //        if (owner == null)
-        //        {
-        //            return NotFound();
-        //        }
+                Entities.Pet? petEntity = await _petStoreRepository.GetPetAsync(ownerId, petId);
+                if (petEntity == null)
+                {
+                    return NotFound("Pet not found");
+                }
 
-        //        Pet? pet = owner.Pets.Find(x => x.Id == petId);
+                HttpPatchPet petPatch = _mapper.Map<HttpPatchPet>(petEntity);
 
-        //        if (pet == null)
-        //        {
-        //            return NotFound();
-        //        }
+                // This ModelState will be applied on the jsonPatchDocument,
+                // not on the patchPet object
+                jsonPatchDocument.ApplyTo(petPatch, ModelState);
 
-        //        HttpPatchPet patchPet = new HttpPatchPet()
-        //        {
-        //            Name = pet.Name,
-        //            Description = pet.Description,
-        //        };
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-        //        // This ModelState will be applied on the jsonPatchDocument,
-        //        // not on the patchPet object
-        //        jsonPatchDocument.ApplyTo(patchPet, ModelState);
+                // Model validation for patchPer object
+                if (!TryValidateModel(petPatch))
+                {
+                    return BadRequest(ModelState);
+                }
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest(ModelState);
-        //        }
+                _mapper.Map(petPatch, petEntity);
 
-        //        // Model validation for patchPer object
-        //        if (!TryValidateModel(patchPet))
-        //        {
-        //            return BadRequest(ModelState);
-        //        }
+                await _petStoreRepository.SaveChangesAsync();
 
-        //        pet.Name = patchPet.Name;
-        //        pet.Description = patchPet.Description;
+                return Ok(_mapper.Map<Pet>(petEntity));
 
-        //        return Ok(pet);
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogCritical("Exception while updating a pet", ex);
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "A problem happened while handling your request.");
-        //    }
-        //}
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical("Exception while updating a pet", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "A problem happened while handling your request.");
+            }
+        }
 
         //[HttpDelete("{petId}")]
         //public ActionResult<Pet> DeletePet(int ownerId, int petId)
