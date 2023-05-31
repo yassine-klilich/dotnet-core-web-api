@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PracticeWebAPI.Models;
 
 namespace PracticeWebAPI.Profiles
 {
@@ -6,6 +7,9 @@ namespace PracticeWebAPI.Profiles
     {
         public PetProfile() {
             CreateMap<Entities.Pet, Models.Pet>();
+            CreateMap<Models.Pet, Entities.Pet>();
+            CreateMap<Models.HttpPostPet, Entities.Pet>();
+            CreateMap<Models.HttpPutPet, Entities.Pet>();
         }
     }
 }

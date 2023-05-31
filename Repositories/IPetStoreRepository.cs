@@ -14,7 +14,11 @@ namespace PracticeWebAPI.Repositories
 
         public Task<Pet?> GetPetAsync(int ownerId, int petId);
 
+        public Task<bool> PetExistsAsync(int petId);
+
         public void AddOwner(Owner owner);
+
+        public Task AddPet(Pet pet);
 
         public Task<bool> SaveChangesAsync();
     }

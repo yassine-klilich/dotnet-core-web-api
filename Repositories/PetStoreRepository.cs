@@ -51,5 +51,15 @@ namespace PracticeWebAPI.Repositories
         {
             return await _petStoreDbContext.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> PetExistsAsync(int petId)
+        {
+            return await _petStoreDbContext.Pets.AnyAsync(p => p.Id == petId);
+        }
+
+        public async Task AddPet(Pet pet)
+        {
+            await _petStoreDbContext.Pets.AddAsync(pet);
+        }
     }
 }

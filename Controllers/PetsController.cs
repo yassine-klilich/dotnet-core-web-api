@@ -59,55 +59,51 @@ namespace PracticeWebAPI.Controllers
             return Ok(_mapper.Map<Pet>(result));
         }
 
-        //[HttpPost]
-        //public ActionResult<Pet> PostPet(int ownerId, HttpPostPet postPet)
-        //{
-        //    Owner? owner = _getOwner(ownerId);
+        [HttpPost]
+        public async Task<ActionResult<Pet>> PostPet(int ownerId, HttpPostPet postPet)
+        {
+            if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
+            {
+                return NotFound("Owner not found");
+            }
 
-        //    if (owner == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var petEntity = _mapper.Map<Entities.Pet>(postPet);
 
-        //    int id = owner.Pets.Count;
-        //    Pet newPet = new Pet()
-        //    {
-        //        Id = id,
-        //        Name = postPet.Name,
-        //        Description = postPet.Description
-        //    };
+            petEntity.OwnerId = ownerId;
 
-        //    owner.Pets.Add(newPet);
+            await _petStoreRepository.AddPet(petEntity);
 
-        //    return CreatedAtRoute("GetPet", new
-        //    {
-        //        ownerId = ownerId,
-        //        petId = id
-        //    }, newPet);
-        //}
+            await _petStoreRepository.SaveChangesAsync();
 
-        //[HttpPut("{petId}")]
-        //public ActionResult<Pet> PutPet(int ownerId, int petId, HttpPutPet putPet)
-        //{
-        //    Owner? owner = _getOwner(ownerId);
+            var createdPet = _mapper.Map<Pet>(petEntity);
 
-        //    if (owner == null)
-        //    {
-        //        return NotFound();
-        //    }
+            return CreatedAtRoute("GetPet", new
+            {
+                ownerId,
+                petId = createdPet.Id
+            }, createdPet);
+        }
 
-        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
+        [HttpPut("{petId}")]
+        public async Task<ActionResult<Pet>> PutPet(int ownerId, int petId, HttpPutPet putPet)
+        {
+            if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
+            {
+                return NotFound("Owner not found");
+            }
 
-        //    if (pet == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var petEntity = await _petStoreRepository.GetPetAsync(ownerId, petId);
+            if (petEntity == null)
+            {
+                return NotFound("Pet not found");
+            }
 
-        //    pet.Name = putPet.Name;
-        //    pet.Description = putPet.Description;
+            _mapper.Map(putPet, petEntity);
 
-        //    return Ok(pet);
-        //}
+            await _petStoreRepository.SaveChangesAsync();
+
+            return Ok(_mapper.Map<Pet>(petEntity));
+        }
 
         //[HttpPatch("{petId}")]
         //public ActionResult<Pet> PatchPet(int ownerId, int petId, JsonPatchDocument<HttpPatchPet> jsonPatchDocument)
