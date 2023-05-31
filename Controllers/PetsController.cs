@@ -152,39 +152,28 @@ namespace PracticeWebAPI.Controllers
             }
         }
 
-        //[HttpDelete("{petId}")]
-        //public ActionResult<Pet> DeletePet(int ownerId, int petId)
-        //{
-        //    Owner? owner = _getOwner(ownerId);
+        [HttpDelete("{petId}")]
+        public async Task<ActionResult<Pet>> DeletePet(int ownerId, int petId)
+        {
+            if (!await _petStoreRepository.OwnerExistsAsync(ownerId))
+            {
+                return NotFound("Owner not found");
+            }
 
-        //    if (owner == null)
-        //    {
-        //        return NotFound();
-        //    }
+            Entities.Pet? petEntity = await _petStoreRepository.GetPetAsync(ownerId, petId);
+            if (petEntity == null)
+            {
+                return NotFound("Pet not found");
+            }
 
-        //    Pet? pet = owner.Pets.Find(x => x.Id == petId);
+            _petStoreRepository.DeletePet(petEntity);
 
-        //    if (pet == null)
-        //    {
-        //        return NotFound();
-        //    }
+            await _petStoreRepository.SaveChangesAsync();
 
-        //    owner.Pets.Remove(pet);
-        //    _localMail.Send("Pet deleted", $"Pet with id {pet.Name} was deleted from the owned {owner.Name}");
+            _localMail.Send("Pet deleted", $"Pet with id {petEntity.Name} was deleted");
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
-        //private Owner? _getOwner(int ownerId)
-        //{
-        //    Owner? owner = _petStoreRepository
-
-        //    if (owner == null)
-        //    {
-        //        _logger.LogInformation($"Can't find an owner with id {ownerId}");
-        //    }
-
-        //    return owner;
-        //}
     }
 }

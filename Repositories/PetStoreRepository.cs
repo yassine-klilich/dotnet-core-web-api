@@ -61,5 +61,10 @@ namespace PracticeWebAPI.Repositories
         {
             await _petStoreDbContext.Pets.AddAsync(pet);
         }
+
+        public void DeletePet(Pet pet)
+        {
+            _petStoreDbContext.Pets.Remove(pet);
+        }
     }
 }

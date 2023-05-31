@@ -20,6 +20,8 @@ namespace PracticeWebAPI.Repositories
 
         public Task AddPet(Pet pet);
 
+        public void DeletePet(Pet pet);
+
         public Task<bool> SaveChangesAsync();
     }
 }
