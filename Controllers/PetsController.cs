@@ -28,6 +28,15 @@ namespace PracticeWebAPI.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        [Route("/api/pets")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name)
+        {
+            var pets = await _petStoreRepository.GetPetsAsync(name);
+
+            return Ok(_mapper.Map<IEnumerable<Pet>>(pets));
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pet>>> GetPets(int ownerId)
         {

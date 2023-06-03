@@ -66,5 +66,15 @@ namespace PracticeWebAPI.Repositories
         {
             _petStoreDbContext.Pets.Remove(pet);
         }
+
+        public async Task<IEnumerable<Pet>> GetPetsAsync(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return await _petStoreDbContext.Pets.ToListAsync();
+            }
+
+            return await _petStoreDbContext.Pets.Where(p => p.Name.Contains(name)).ToListAsync();
+        }
     }
 }
