@@ -10,7 +10,7 @@ namespace PracticeWebAPI.Repositories
 
         public Task<bool> OwnerExistsAsync(int ownerId);
 
-        public Task<IEnumerable<Pet>> GetPetsAsync(string? name);
+        public Task<IEnumerable<Pet>> GetPetsAsync(string? name, string? searchQuery);
 
         public Task<IEnumerable<Pet>> GetPetsAsync(int ownerId);
 

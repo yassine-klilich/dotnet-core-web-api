@@ -30,9 +30,9 @@ namespace PracticeWebAPI.Controllers
 
         [Route("/api/pets")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name)
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name, string? searchQuery)
         {
-            var pets = await _petStoreRepository.GetPetsAsync(name);
+            var pets = await _petStoreRepository.GetPetsAsync(name, searchQuery);
 
             return Ok(_mapper.Map<IEnumerable<Pet>>(pets));
         }

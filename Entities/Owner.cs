@@ -14,7 +14,7 @@ namespace PracticeWebAPI.Entities
         public string Name { get; set; }
 
         [MaxLength(200)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
         
         public List<Pet> Pets { get; set; } = new List<Pet>();
 
