@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PracticeWebAPI.DbContexts;
 using PracticeWebAPI.Entities;
+using PracticeWebAPI.Services;
 
 namespace PracticeWebAPI.Repositories
 {
     public class PetStoreRepository : IPetStoreRepository
     {
+        private const int MAX_PAGE_SIZE = 30;
         private PetStoreDbContext _petStoreDbContext;
 
         public PetStoreRepository(PetStoreDbContext petStoreDbContext) {
@@ -67,8 +69,13 @@ namespace PracticeWebAPI.Repositories
             _petStoreDbContext.Pets.Remove(pet);
         }
 
-        public async Task<IEnumerable<Pet>> GetPetsAsync(string? name, string? searchQuery)
+        public async Task<(IEnumerable<Pet>, PaginationMetadata)> GetPetsAsync(string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
+            if (pageSize > MAX_PAGE_SIZE)
+            {
+                pageSize = MAX_PAGE_SIZE;
+            }
+
             IQueryable<Pet> query = _petStoreDbContext.Pets;
 
             if (string.IsNullOrEmpty(name) == false)
@@ -81,7 +88,15 @@ namespace PracticeWebAPI.Repositories
                 query = query.Where(p => p.Name.Contains(searchQuery) || (p.Description != null && p.Description.Contains(searchQuery)));
             }
 
-            return await query.ToListAsync();
+            int totalRecords = await query.CountAsync();
+
+            PaginationMetadata paginationMetadata = new PaginationMetadata(totalRecords, pageNumber, pageSize);
+
+            query = query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+
+            List<Pet> collectionToReturn = await query.ToListAsync();
+
+            return (collectionToReturn, paginationMetadata);
         }
     }
 }

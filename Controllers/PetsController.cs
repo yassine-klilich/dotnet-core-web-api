@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
 using PracticeWebAPI.Repositories;
 using PracticeWebAPI.Services;
+using System.Text.Json;
 
 namespace PracticeWebAPI.Controllers
 {
@@ -30,9 +31,13 @@ namespace PracticeWebAPI.Controllers
 
         [Route("/api/pets")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name, string? searchQuery)
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
-            var pets = await _petStoreRepository.GetPetsAsync(name, searchQuery);
+            var (pets, paginationMetadata) = await _petStoreRepository
+                .GetPetsAsync(name, searchQuery, pageNumber, pageSize);
+
+            Response.Headers.Add("X-Pagination",
+                JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(_mapper.Map<IEnumerable<Pet>>(pets));
         }

@@ -1,4 +1,5 @@
 ﻿using PracticeWebAPI.Entities;
+using PracticeWebAPI.Services;
 
 namespace PracticeWebAPI.Repositories
 {
@@ -10,7 +11,7 @@ namespace PracticeWebAPI.Repositories
 
         public Task<bool> OwnerExistsAsync(int ownerId);
 
-        public Task<IEnumerable<Pet>> GetPetsAsync(string? name, string? searchQuery);
+        public Task<(IEnumerable<Pet>, PaginationMetadata)> GetPetsAsync(string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10);
 
         public Task<IEnumerable<Pet>> GetPetsAsync(int ownerId);
 
