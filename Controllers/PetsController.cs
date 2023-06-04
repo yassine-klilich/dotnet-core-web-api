@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
@@ -9,6 +10,7 @@ using System.Text.Json;
 namespace PracticeWebAPI.Controllers
 {
     [Route("api/owners/{ownerId}/pets")]
+    [Authorize]
     [ApiController]
     public class PetsController : ControllerBase
     {

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PracticeWebAPI;
 using PracticeWebAPI.DbContexts;
 using PracticeWebAPI.Repositories;
 using PracticeWebAPI.Services;
 using Serilog;
+using System.Text;
 
 // Add Serilog logger configurations
 Log.Logger = new LoggerConfiguration()
@@ -52,6 +54,21 @@ builder.Services.AddScoped<IPetStoreRepository, PetStoreRepository>();
 // AutoMapper scans for Profiles throught Assemblies of the app
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretKey"]))
+        };
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -69,6 +86,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

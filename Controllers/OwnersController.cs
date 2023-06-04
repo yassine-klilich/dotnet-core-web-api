@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PracticeWebAPI.Models;
@@ -7,6 +8,7 @@ using PracticeWebAPI.Repositories;
 namespace PracticeWebAPI.Controllers
 {
     [Route("api/owners")]
+    [Authorize]
     [ApiController]
     public class OwnersController : ControllerBase
     {
