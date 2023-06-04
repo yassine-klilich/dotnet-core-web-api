@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PracticeWebAPI.DbContexts;
 
@@ -10,9 +11,11 @@ using PracticeWebAPI.DbContexts;
 namespace PracticeWebAPI.Migrations
 {
     [DbContext(typeof(PetStoreDbContext))]
-    partial class PetStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230604144332_add_city_column_pets_table")]
+    partial class add_city_column_pets_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,6 +74,11 @@ namespace PracticeWebAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -93,6 +101,7 @@ namespace PracticeWebAPI.Migrations
                         new
                         {
                             Id = 1,
+                            City = "Tangier",
                             Description = "Cat",
                             Name = "Mimi",
                             OwnerId = 1
@@ -100,6 +109,7 @@ namespace PracticeWebAPI.Migrations
                         new
                         {
                             Id = 2,
+                            City = "Rabat",
                             Description = "Dog",
                             Name = "Dodi",
                             OwnerId = 1
@@ -107,6 +117,7 @@ namespace PracticeWebAPI.Migrations
                         new
                         {
                             Id = 3,
+                            City = "Casa",
                             Description = "Lion",
                             Name = "Alex",
                             OwnerId = 2
@@ -114,6 +125,7 @@ namespace PracticeWebAPI.Migrations
                         new
                         {
                             Id = 4,
+                            City = "Tangier",
                             Description = "Giraffe",
                             Name = "Djilali",
                             OwnerId = 3

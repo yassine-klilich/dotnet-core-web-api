@@ -43,7 +43,7 @@ namespace PracticeWebAPI.Controllers
             claimsForToken.Add(new Claim("email", user.Email));
             claimsForToken.Add(new Claim("phone_number", user.Phone));
             claimsForToken.Add(new Claim("address", user.Address));
-            claimsForToken.Add(new Claim("address", user.Address));
+            claimsForToken.Add(new Claim("admin", user.Admin.ToString()));
 
             JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(
                 _configuration["Authentication:Issuer"],
@@ -75,6 +75,7 @@ namespace PracticeWebAPI.Controllers
                     Phone = "0600000000",
                     Address = "Branes 1",
                     City = "Tangier",
+                    Admin = false
                 };
 
             }
@@ -99,6 +100,7 @@ namespace PracticeWebAPI.Controllers
             public string Phone { get; set; } = string.Empty;
             public string Address { get; set; } = string.Empty;
             public string City { get; set; } = string.Empty;
+            public bool Admin { get; set; }
         }
     }
 }

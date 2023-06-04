@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace PracticeWebAPI.Controllers
 {
     [Route("api/owners/{ownerId}/pets")]
-    [Authorize]
+    [Authorize(Policy = "Admin")]
     [ApiController]
     public class PetsController : ControllerBase
     {
