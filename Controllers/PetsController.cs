@@ -9,9 +9,10 @@ using System.Text.Json;
 
 namespace PracticeWebAPI.Controllers
 {
-    [Route("api/owners/{ownerId}/pets")]
-    [Authorize(Policy = "Admin")]
     [ApiController]
+    //[Authorize(Policy = "Admin")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/owners/{ownerId}/pets")]
     public class PetsController : ControllerBase
     {
         private readonly ILogger<PetsController> _logger;
@@ -31,7 +32,7 @@ namespace PracticeWebAPI.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [Route("/api/pets")]
+        [Route("/api/v{version:apiVersion}/pets")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pet>>> GetPets(string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {

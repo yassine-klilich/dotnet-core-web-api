@@ -59,7 +59,7 @@ namespace PracticeWebAPI.Controllers
             return Ok(token);
         }
 
-        public PetStoreUser? ValidateUser(LoginAuthentication authenticationUser)
+        internal PetStoreUser? ValidateUser(LoginAuthentication authenticationUser)
         {
             // Let's imagine we have check user credentials and they were correct, and return the user object*
             if (authenticationUser.UserName == "yassine-klilich" && authenticationUser.Password == "123")

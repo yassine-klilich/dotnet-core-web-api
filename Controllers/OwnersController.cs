@@ -7,9 +7,11 @@ using PracticeWebAPI.Repositories;
 
 namespace PracticeWebAPI.Controllers
 {
-    [Route("api/owners")]
-    [Authorize]
     [ApiController]
+    //[Authorize]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/owners")]
     public class OwnersController : ControllerBase
     {
         private readonly IPetStoreRepository _petStoreRepository;
